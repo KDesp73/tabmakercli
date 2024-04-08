@@ -13,7 +13,9 @@
 //
 // Define constants for tuning names and strings
 #define NUM_TUNINGS 8
-int pos=5;
+int xpos=5;
+int ypos=1;
+int rows, cols;
 
 char *tuningNames[NUM_TUNINGS] = {"E", 
                                   "D#",
@@ -44,16 +46,18 @@ void setTuning(char *input){
         char tuningSpec[256];
         strcpy(tuningSpec, input + 2); // Skip "t " prefix
         int tuningIndex = -1;
-        int rows, cols;
-        getmaxyx(stdscr, rows, cols); // Get the dimensions of the terminal screen
  
         // Determine the new tuning index based on the input tuning specifier
         // Modify this part according to your tuning specifications
-        if (strcmp(tuningSpec, "e") == 0) {
-           tuningIndex = 0; // E Standard
-        } else if (strcmp(tuningSpec, "d#") == 0) {
-           tuningIndex = 1; // D Standard
-        } else {
+        for (int i =0; i<NUM_TUNINGS;++i)
+        {
+          if(strcasecmp(tuningSpec, tuningNames[i]) == 0)
+          {
+            tuningIndex = i;
+            break;
+          }
+        }
+         if(tuningIndex==-1) {
             // Add cases for other tunings as needed
             mvprintw(LINES - 2, 0, "Invalid tuning specifier"); // Notify user of invalid input
             refresh();
@@ -72,12 +76,22 @@ void setTuning(char *input){
 
 }
 
+void movePos()
+{
+  xpos+=2;
+  if(xpos>cols)
+  {
+    xpos=1;
+    ypos+=8;
+  }
+}
 
+// Add a note/s
 void addNote(char input[])
 {
-   
-   mvprintw(input[0]-'0'+1,pos,"%c", input[2]);
-   pos++;
+   // Move to position
+   mvprintw(input[0]-'0'+ypos,xpos,"%c", input[2]);
+   movePos();
    refresh();
    
 }
@@ -135,7 +149,7 @@ void handleInput(WINDOW *input_win) {
       addNote(input);
     }else if(strncmp(input, "-",1) == 0)
     {
-      pos++;
+      movePos();
     }
 }
 
@@ -144,18 +158,22 @@ int main() {
     initscr();
     cbreak();
     noecho();
-
+    scrollok(stdscr,TRUE);
     // Create window for input
     WINDOW *input_win = newwin(1, COLS, LINES - 1, 0);
     scrollok(input_win, FALSE);
 
     // Display help message
     mvprintw(LINES - 2, 0, "(? for help)");
+    getmaxyx(stdscr, rows, cols); // Get the dimensions of the terminal screen
 
- 
    // Draw guitar tabs for E Standard
     for (int i = 2; i < 8; i++) {
-        mvprintw(i, 1, "%s %s", tuningStrings[0][i-2], "|-------------------------------");
+       mvprintw(i,1, "%s %s", tuningStrings[0][i-2],"|");
+       for(int j=4;j<cols;j++)
+       {
+         mvprintw(i,j,"-");
+       }
     }
 
     // Refresh the screen
