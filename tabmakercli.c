@@ -13,7 +13,7 @@
 //
 // Define constants for tuning names and strings
 #define NUM_TUNINGS 8
-#define POSITION    5
+int pos=5;
 
 char *tuningNames[NUM_TUNINGS] = {"E", 
                                   "D#",
@@ -73,16 +73,17 @@ void setTuning(char *input){
 }
 
 
-void addNote(char* input)
+void addNote(char input[])
 {
    
-   mvprintw(2,POSITION,"%c", &input[1]);
+   mvprintw(input[0]-'0'+1,pos,"%c", input[2]);
+   pos++;
    refresh();
    
 }
 
 void handleInput(WINDOW *input_win) {
-    char input[256];
+    char input[16];
     int input_len = 0;
     // Display input prompt
     mvwprintw(input_win, 0, 0, "input command: ");
@@ -129,9 +130,12 @@ void handleInput(WINDOW *input_win) {
     if (strncmp(input, "t ", 2) == 0)
     {
       setTuning(input);
-    }else if(strncmp(input, "1 ", 2) == 0)
+    }else if(isdigit(input[0])&& input[2]< '7')
     {
       addNote(input);
+    }else if(strncmp(input, "-",1) == 0)
+    {
+      pos++;
     }
 }
 
