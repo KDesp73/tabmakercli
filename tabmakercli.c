@@ -99,15 +99,29 @@ void addNote(char input[])
 
    }else
    {
-     for(int i=0;i<strlen(notes);i+=2)
+     for(int i=0;i<strlen(notes);i++)
      {
-        mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
-      movePos();
-      refresh();
+      if(notes[i]!=' '){
+       
+          mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
+        if((i+1)<strlen(notes) && notes[i+1]!= ' ' )
+        {
+          xpos++;
+          mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i+1]);
+          
+          i++;
+        }
+
+       
+        movePos(); 
+        refresh();
+
+     
+
      }
    }
 }
-
+}
 void handleInput(WINDOW *input_win)
 {
     char input[16];
