@@ -102,17 +102,15 @@ void addNote(char input[])
      for(int i=0;i<strlen(notes);i++)
      {
       if(notes[i]!=' '){
-       
-          mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
-        if((i+1)<strlen(notes) && notes[i+1]!= ' ' )
-        {
-          xpos++;
-          mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i+1]);
-          
-          i++;
-        }
+        mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
 
-       
+        if((i+1)<strlen(notes) & notes[i+1]!=' ')
+        {
+        xpos++;
+         mvprintw(input[0]-'0'+ypos,xpos,"%c",notes[i+1]);
+
+         i++;
+        }       
         movePos(); 
         refresh();
 
