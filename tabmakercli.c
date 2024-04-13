@@ -43,6 +43,7 @@ char *allowedChars = " 1234567890bx~";
 
 char *allowedAno = "ph/'\\'";
 
+
 // MAIN PROGRAM
 
 void renderTab()
@@ -91,8 +92,8 @@ void setTuning(char *input){
    
     for (int i = 2; i < 8; i++) 
     {
-      mvprintw(i, 1, " ");
-      mvprintw(i, 0, "%s", tuningStrings[tuningIndex][i-2]);
+      mvprintw(i, 2, " ");
+      mvprintw(i, 1, "%s", tuningStrings[tuningIndex][i-2]);
     }
     refresh();
 }
@@ -105,7 +106,7 @@ void addNote(char input[])
   
      for(int i=0;i<strlen(notes);i++)
      {
-      if(notes[i]!=' '){
+      if(notes[i]!=' '&& strchr(allowedAno, notes[i])==NULL){
         
 
         if((i+1)<strlen(notes) && notes[i+1]!=' ' && (strchr(allowedChars, notes[i+1])!=NULL))
@@ -165,7 +166,7 @@ void handleInput(WINDOW *input_win)
                 wrefresh(input_win);
                 input[--input_len] = '\0'; 
             }
-        } else if (input_len < sizeof(input) - 1 &&( strchr(allowedChars, ch)|| strchr(allowedAno, ch))) 
+        } else if (input_len < sizeof(input) - 1 ) 
         { 
             input[input_len++] = ch;
             input[input_len] = '\0'; 
@@ -190,7 +191,26 @@ void handleInput(WINDOW *input_win)
     }else if(strncmp(input, "-",1) == 0)
     {
       movePos(2);
-    }
+    }else if(strncmp(input, "r ",1)==0)
+    {
+      if((input[2] >= '0' && input[2] <= '9') && (input[4] >= '0' && input[4] <= '9') && input[3]=='/' )
+      {        
+          mvprintw(3+ypos,xpos,"%c", input[2]);
+          mvprintw(4+ypos,xpos,"%c", input[3]);
+          mvprintw(5+ypos,xpos,"%c", input[4]);
+          movePos(2);
+      }    
+    }else if(strncmp(input, "|",1)==0)
+      {
+         for(int j=1;j<7;j++)
+         {
+             mvprintw(j+ypos,xpos, "|");
+             
+
+         }
+         movePos(2);
+      }
+
   refresh();
 }
 
