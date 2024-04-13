@@ -1,11 +1,6 @@
 
 
 
-
-
-
-
-
 #include <ncurses.h>
 #include <string.h>
 #include <ctype.h>
@@ -13,7 +8,9 @@
 // HEADERS 
 
 #define NUM_TUNINGS 8
-int xpos=5;
+
+
+int xpos=7;
 int ypos=1;
 int tabNum=1;
 int rows, cols;
@@ -42,19 +39,32 @@ char *tuningStrings[NUM_TUNINGS][6] = {
     {"A", "E", "C#", "G#", "D#", "A"} // A Standard
 };
 
+char *allowedChars = " 1234567890phb/'\\'x~";
+
 
 
 // MAIN PROGRAM
 
-
-void movePos()
+void renderTab()
 {
-  xpos+=2;
-  if(xpos>cols)
+    for (int i = ypos+1; i < ypos+7; i++) 
+    {
+      for(int j=0;j<cols;j++)
+       {
+         mvprintw(i,j,"-");
+       }
+    }
+}
+
+void movePos(int x)
+{
+  xpos+=x;
+  if(xpos>=cols)
   {
-    xpos=1;
+    xpos=2;
     ypos+=8;
     tabNum++;
+    renderTab();
   }
 }
 
@@ -91,11 +101,11 @@ void setTuning(char *input){
 void addNote(char input[])
 {
    char notes[32];
-   strcpy(notes, input+2);
+   strcpy(notes, input+1);
    if(strlen(notes)==1)
    {
      mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[0]);
-     movePos();
+     movePos(2);
      refresh();
 
    }else
@@ -103,18 +113,32 @@ void addNote(char input[])
      for(int i=0;i<strlen(notes);i++)
      {
       if(notes[i]!=' '){
-        mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
+        
 
-        if((i+1)<strlen(notes) & notes[i+1]!=' ')
+        if((i+1)<strlen(notes) && notes[i+1]!=' ' && (isdigit(notes[i+1]) || notes[i+1]=='~'))
         {
-        xpos++;
+         movePos(1);
+         mvprintw(input[0]-'0'+ypos,xpos-1,"%c", notes[i]);
          mvprintw(input[0]-'0'+ypos,xpos,"%c",notes[i+1]);
-
          i++;
-        }       
-        movePos(); 
-        refresh();
+        }else if (strchr("ph/'\\'", notes[i+1]) != NULL && (i+2)<strlen(notes) && notes[i+2]!=' ')
+        {
+          movePos(2);
+          mvprintw(input[0]-'0'+ypos,xpos-2,"%c", notes[i]);
+          mvprintw(input[0]-'0'+ypos,xpos-1,"%c",notes[i+1]);
+          mvprintw(input[0]-'0'+ypos,xpos,"%c",notes[i+2]);
 
+          i+=2;
+
+        }
+
+        else {
+          mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
+
+        }
+        
+        movePos(2);
+        
      
 
      }
@@ -149,7 +173,7 @@ void handleInput(WINDOW *input_win)
                 wrefresh(input_win);
                 input[--input_len] = '\0'; 
             }
-        } else if (input_len < sizeof(input) - 1) 
+        } else if (input_len < sizeof(input) - 1 && strchr(allowedChars, ch)) 
         { 
             input[input_len++] = ch;
             input[input_len] = '\0'; 
@@ -165,16 +189,27 @@ void handleInput(WINDOW *input_win)
         input[i] = tolower(input[i]);
     }
 
-    if (strncmp(input, "t ", 2) == 0)
+    if (strncmp(input, "t ", 1) == 0)
     {
       setTuning(input);
-    }else if(isdigit(input[0])&& input[2]< '7')
+    }else if(isdigit(input[0])&& input[0]< '7')
     {
       addNote(input);
     }else if(strncmp(input, "-",1) == 0)
     {
-      movePos();
+      movePos(2);
     }
+  refresh();
+}
+
+void showPos()
+{
+   move(8, 0);
+    
+   clrtoeol();
+   mvprintw(8,xpos,"^");
+   refresh();
+
 }
 
 int main() 
@@ -203,6 +238,7 @@ int main()
     refresh();   
     while (1) 
     {
+        showPos();
         handleInput(input_win);
     }
 
