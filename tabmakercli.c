@@ -39,9 +39,9 @@ char *tuningStrings[NUM_TUNINGS][6] = {
     {"A", "E", "C#", "G#", "D#", "A"} // A Standard
 };
 
-char *allowedChars = " 1234567890phb/'\\'x~";
+char *allowedChars = " 1234567890bx~";
 
-
+char *allowedAno = "ph/'\\'";
 
 // MAIN PROGRAM
 
@@ -101,27 +101,20 @@ void setTuning(char *input){
 void addNote(char input[])
 {
    char notes[32];
-   strcpy(notes, input+1);
-   if(strlen(notes)==1)
-   {
-     mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[0]);
-     movePos(2);
-     refresh();
-
-   }else
-   {
+   strcpy(notes, input+2);
+  
      for(int i=0;i<strlen(notes);i++)
      {
       if(notes[i]!=' '){
         
 
-        if((i+1)<strlen(notes) && notes[i+1]!=' ' && (isdigit(notes[i+1]) || notes[i+1]=='~'))
+        if((i+1)<strlen(notes) && notes[i+1]!=' ' && (strchr(allowedChars, notes[i+1])!=NULL))
         {
          movePos(1);
          mvprintw(input[0]-'0'+ypos,xpos-1,"%c", notes[i]);
          mvprintw(input[0]-'0'+ypos,xpos,"%c",notes[i+1]);
          i++;
-        }else if (strchr("ph/'\\'", notes[i+1]) != NULL && (i+2)<strlen(notes) && notes[i+2]!=' ')
+        }else if (strchr(allowedAno, notes[i+1]) != NULL && (i+2)<strlen(notes) && notes[i+2]!=' ')
         {
           movePos(2);
           mvprintw(input[0]-'0'+ypos,xpos-2,"%c", notes[i]);
@@ -132,11 +125,10 @@ void addNote(char input[])
 
         }
 
-        else {
+        else if((strchr(allowedChars, notes[i])!=NULL))  {
           mvprintw(input[0]-'0'+ypos,xpos,"%c", notes[i]);
 
-        }
-        
+        }        
         movePos(2);
         
      
@@ -144,7 +136,7 @@ void addNote(char input[])
      }
    }
 }
-}
+
 void handleInput(WINDOW *input_win)
 {
     char input[16];
@@ -173,7 +165,7 @@ void handleInput(WINDOW *input_win)
                 wrefresh(input_win);
                 input[--input_len] = '\0'; 
             }
-        } else if (input_len < sizeof(input) - 1 && strchr(allowedChars, ch)) 
+        } else if (input_len < sizeof(input) - 1 &&( strchr(allowedChars, ch)|| strchr(allowedAno, ch))) 
         { 
             input[input_len++] = ch;
             input[input_len] = '\0'; 
