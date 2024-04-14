@@ -4,10 +4,18 @@
   / /\/ _` | '_ \ /    \ / _` | |/ / _ \ '__/ /  | | |
  / / | (_| | |_) / /\/\ \ (_| |   <  __/ | / /___| | |
  \/   \__,_|_.__/\/    \/\__,_|_|\_\___|_| \____/|_|_|
-
-
-
 */
+
+/*
+ * To-Do:
+ *  Add support for more strings
+ *  Add Tempo, comments, Parts
+ *  Export as txt
+ *  Add chords
+ *  Delete chords/notes
+ *  Delete Tabs
+ *  Copy/Paste whole Tabs
+ */
 
 #include <ncurses.h>
 #include <string.h>
@@ -24,7 +32,7 @@ int xpos = 7;
 int ypos = COM_GAP;
 int curTab = 1;
 int rows, cols;
-int numTabs=1;
+int numTabs = 1;
 
 char *tuningNames[NUM_TUNINGS] =
     {
@@ -35,8 +43,7 @@ char *tuningNames[NUM_TUNINGS] =
         "C",
         "B",
         "A#",
-        "A"
-    };
+        "A"};
 // Add more tunings as needded, dont forget to also add the name and change NUM_TUNINGS
 char *tuningStrings[NUM_TUNINGS][NUM_STRINGS] = {
     // Standard Tunings
@@ -66,7 +73,6 @@ char *commands = "ts|";
 
 // MAIN PROGRAM
 
-
 void showPos()
 {
   curs_set(0);
@@ -75,7 +81,6 @@ void showPos()
   mvprintw(ypos + NUM_STRINGS, xpos, "^");
   refresh();
 }
-
 
 void renderTab()
 {
@@ -91,70 +96,55 @@ void renderTab()
 
 void moveYPos(int y)
 {
-    
-    if(curTab!=1)
-    {
-      if(y==-1)
-      {
-      
-        move(ypos + NUM_STRINGS, 0);
-        clrtoeol();
-        ypos-=COM_GAP+NUM_STRINGS;
-        curTab--;
-        showPos();
-      }
-      
-    }
-    else if(numTabs>curTab-1)
-    {
-    
-      if (y==1)
-      {
-        move(ypos + NUM_STRINGS, 0);
-        clrtoeol();
-        ypos+=COM_GAP+NUM_STRINGS;
-        curTab++;
-        showPos();
 
-      }
-    
-
+  if (y == -1)
+  {
+    if (curTab>1)
+    {
+      move(ypos + NUM_STRINGS, 0);
+      clrtoeol();
+      ypos -= COM_GAP + NUM_STRINGS;
+      curTab--;
+      showPos();
     }
-     
-    
-      
-   
+  }
+  else if (y == 1 )
+  {
+
+    if (numTabs != curTab || curTab==1 )
+    {
+      move(ypos + NUM_STRINGS, 0);
+      clrtoeol();
+      ypos += COM_GAP + NUM_STRINGS;
+      curTab++;
+      showPos();
+    }
+  }
 }
 
 void moveXPos(int x)
 {
   move(ypos + NUM_STRINGS, 0);
   clrtoeol();
-  if(xpos+x>=4)
+  if (xpos + x >= 4)
   {
     xpos += x;
     if (xpos >= cols)
     {
       xpos = 4;
-      
+
       moveYPos(1);
       renderTab();
     }
-      showPos();
-
+    showPos();
   }
-  else if (ypos>COM_GAP)
+  else if (ypos > COM_GAP)
   {
-    xpos = cols-1; 
+    xpos = cols - 1;
     moveYPos(-1);
     showPos();
-
   }
-  
 }
-
-
-
 
 void setTuning(char *input)
 {
@@ -180,8 +170,8 @@ void setTuning(char *input)
 
   for (int i = 0; i < NUM_STRINGS; i++)
   {
-    mvprintw(ypos+i, 2, " ");
-    mvprintw(ypos+i, 1, "%s", tuningStrings[tuningIndex][i]);
+    mvprintw(COM_GAP + i, 2, " ");
+    mvprintw(COM_GAP + i, 1, "%s", tuningStrings[tuningIndex][i]);
   }
   refresh();
 }
@@ -190,20 +180,19 @@ void addNote(char input[])
 {
   char notes[32];
   strcpy(notes, input + 2);
-  int selectedString = input[0] - '0'  - 1;
+  int selectedString = input[0] - '0' - 1;
   for (int i = 0; i < strlen(notes); i++)
   {
     if (notes[i] != ' ' && strchr(allowedAno, notes[i]) == NULL)
     {
 
-      if ((i + 1) < strlen(notes) && notes[i + 1] != ' ' && strchr(allowedChars, notes[i + 1]) != NULL && strchr(allowedChars, notes[i])!= NULL)
+      if ((i + 1) < strlen(notes) && notes[i + 1] != ' ' && strchr(allowedChars, notes[i + 1]) != NULL && strchr(allowedChars, notes[i]) != NULL)
       {
         moveXPos(1);
-        mvprintw(selectedString + ypos,xpos-1, "%c", notes[i]);
+        mvprintw(selectedString + ypos, xpos - 1, "%c", notes[i]);
         mvprintw(selectedString + ypos, xpos, "%c", notes[i + 1]);
         i++;
         moveXPos(2);
-
       }
       else if (strchr(allowedAno, notes[i + 1]) != NULL && (i + 2) < strlen(notes) && notes[i + 2] != ' ')
       {
@@ -214,51 +203,47 @@ void addNote(char input[])
 
         i += 2;
         moveXPos(2);
-
       }
-
       else if ((strchr(allowedChars, notes[i]) != NULL))
       {
         mvprintw(selectedString + ypos, xpos, "%c", notes[i]);
         moveXPos(2);
-
       }
-      }
+    }
   }
 }
 
 void addTimeSignature(char input[])
 {
-    bool flag = false;
-    for (int j = 0; j < NUM_TIMESIG; j++)
+  bool flag = false;
+  for (int j = 0; j < NUM_TIMESIG; j++)
+  {
+    if (strcmp(input + 2, timeSignatures[j]) == 0)
     {
-      if (strcmp(input + 2, timeSignatures[j]) == 0)
-      {
-        flag = true;
-        break;
-      }
+      flag = true;
+      break;
     }
-    if (flag)
+  }
+  if (flag)
+  {
+    int line = ypos + 2;
+    int column = xpos;
+
+    for (int j = 2; j < strlen(input); j++)
     {
-      int line = ypos + 2;
-      int column = xpos;
-
-      for (int j = 2; j < strlen(input); j++)
+      if (input[j] == '/')
       {
-        if (input[j] == '/')
-        {
-          column = xpos;
-          line++;
-          mvprintw(line, column, "/");
-          line++;
-          j++;
-        }
-        mvprintw(line, column, "%c", input[j]);
-        column++;
+        column = xpos;
+        line++;
+        mvprintw(line, column, "/");
+        line++;
+        j++;
       }
-      moveXPos(3);
+      mvprintw(line, column, "%c", input[j]);
+      column++;
     }
-
+    moveXPos(3);
+  }
 }
 
 void handleInput(WINDOW *input_win)
@@ -267,10 +252,9 @@ void handleInput(WINDOW *input_win)
   int input_len = 0;
   mvwprintw(input_win, 0, 0, "input command: ");
   wrefresh(input_win);
-  
+
   while (1)
   {
-    
 
     int ch = wgetch(input_win);
     if (ch == '\n')
@@ -291,19 +275,19 @@ void handleInput(WINDOW *input_win)
         input[--input_len] = '\0';
       }
     }
-    else if ( ch == KEY_RIGHT )
+    else if (ch == KEY_RIGHT)
     {
       moveXPos(1);
     }
-    else if ( ch == KEY_LEFT )
+    else if (ch == KEY_LEFT)
     {
       moveXPos(-1);
     }
-    else if ( ch == KEY_DOWN)
+    else if (ch == KEY_DOWN)
     {
       moveYPos(1);
     }
-    else if ( ch == KEY_UP )
+    else if (ch == KEY_UP)
     {
       moveYPos(-1);
     }
@@ -316,16 +300,14 @@ void handleInput(WINDOW *input_win)
       mvwaddch(input_win, 0, 14 + input_len - 1, ch);
       wrefresh(input_win);
     }
-    
   }
-  
-  
+
   for (int i = 0; input[i]; i++)
   {
     input[i] = tolower(input[i]);
   }
 
-  if (strncmp(input, "t ",2) == 0)
+  if (strncmp(input, "t ", 2) == 0)
   {
     setTuning(input);
   }
@@ -335,7 +317,7 @@ void handleInput(WINDOW *input_win)
   }
   else if (strncmp(input, "s ", 2) == 0)
   {
-    addTimeSignature(input); 
+    addTimeSignature(input);
   }
   else if (strcmp(input, "|") == 0)
   {
@@ -345,20 +327,16 @@ void handleInput(WINDOW *input_win)
     }
     moveXPos(2);
   }
-
   refresh();
 }
 
 int main()
 {
-
   initscr();
-  
   cbreak();
   noecho();
   scrollok(stdscr, TRUE);
   curs_set(0);
- 
 
   WINDOW *input_win = newwin(1, COLS, LINES - 1, 0);
   scrollok(input_win, FALSE);
@@ -374,17 +352,15 @@ int main()
     {
       mvprintw(i, j, "-");
     }
-
   }
   showPos();
   refresh();
   while (1)
   {
-    
+
     handleInput(input_win);
   }
 
-  endwin();
-
+endwin();
   return 0;
 }
