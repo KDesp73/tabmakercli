@@ -20,7 +20,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdlib.h>
+
 
 // HEADERS
 
@@ -110,15 +110,11 @@ void moveYPos(int y)
   }
   else if (y == 1 )
   {
-
-    if (numTabs != curTab || curTab==1 )
-    {
-      move(ypos + NUM_STRINGS, 0);
+       move(ypos + NUM_STRINGS, 0);
       clrtoeol();
       ypos += COM_GAP + NUM_STRINGS;
       curTab++;
       showPos();
-    }
   }
 }
 
@@ -132,9 +128,18 @@ void moveXPos(int x)
     if (xpos >= cols)
     {
       xpos = 4;
+      mvprintw(ypos,xpos,"%d %d", numTabs, curTab); 
+      
+      if(numTabs==curTab)
+      {
+        moveYPos(1);
+        renderTab();
 
-      moveYPos(1);
-      renderTab();
+      }
+      else if(numTabs>curTab)
+      {
+        moveYPos(1);
+      }
     }
     showPos();
   }
@@ -248,7 +253,7 @@ void addTimeSignature(char input[])
 
 void handleInput(WINDOW *input_win)
 {
-  char input[64];
+  char input[32];
   int input_len = 0;
   mvwprintw(input_win, 0, 0, "input command: ");
   wrefresh(input_win);
@@ -285,7 +290,11 @@ void handleInput(WINDOW *input_win)
     }
     else if (ch == KEY_DOWN)
     {
-      moveYPos(1);
+      if(numTabs!=curTab)
+      {
+        moveYPos(1);
+      }
+     
     }
     else if (ch == KEY_UP)
     {
