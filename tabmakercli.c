@@ -97,7 +97,7 @@ void renderTab()
 void moveYPos(int y)
 {
 
-  if (y == -1 )
+  if (y == -1)
   {
     if (curTab>1 && xpos>=6)
     {
@@ -123,7 +123,7 @@ void moveXPos(int x)
 {
   move(ypos + NUM_STRINGS, 0);
   clrtoeol();
-  if (xpos+x > 0)
+  if (xpos+x > 4 || (xpos+x>0 && curTab>1))
   {
     xpos += x;
     if (xpos >= cols)
