@@ -86,7 +86,7 @@ void renderTab()
 {
   for (int i = ypos; i < ypos + NUM_STRINGS; i++)
   {
-    for (int j = 4; j < cols; j++)
+    for (int j = 0; j < cols; j++)
     {
       mvprintw(i, j, "-");
     }
@@ -97,9 +97,9 @@ void renderTab()
 void moveYPos(int y)
 {
 
-  if (y == -1)
+  if (y == -1 )
   {
-    if (curTab>1)
+    if (curTab>1 && xpos>=6)
     {
       move(ypos + NUM_STRINGS, 0);
       clrtoeol();
@@ -110,10 +110,11 @@ void moveYPos(int y)
   }
   else if (y == 1 )
   {
-       move(ypos + NUM_STRINGS, 0);
+      move(ypos + NUM_STRINGS, 0);
       clrtoeol();
       ypos += COM_GAP + NUM_STRINGS;
       curTab++;
+     
       showPos();
   }
 }
@@ -122,13 +123,13 @@ void moveXPos(int x)
 {
   move(ypos + NUM_STRINGS, 0);
   clrtoeol();
-  if (xpos + x >= 4)
+  if (xpos+x > 0)
   {
     xpos += x;
     if (xpos >= cols)
     {
       xpos = 4;
-      mvprintw(ypos,xpos,"%d %d", numTabs, curTab); 
+      
       
       if(numTabs==curTab)
       {
