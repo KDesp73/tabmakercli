@@ -35,7 +35,7 @@ int ypos       = COM_GAP;  /* initial Y position */
 int curTab     = 1;        /* initial current tab */
 int numTabs    = 1;        /* initial number of tabs */
 int rows, cols;            /* initialisation of terminal rows and columns */
-
+WINDOW *output_win;
 
 char *tuningNames[NUM_TUNINGS] =
     {"E", "D#", "D", "C#", "C", "B", "A#", "A"};
@@ -63,11 +63,10 @@ void
 showPos()
 {
   curs_set(0);
-  move(ypos + NUM_STRINGS, 0);
-  clrtoeol();
-  mvprintw(ypos + NUM_STRINGS, xpos, "^");
-  refresh();
-}
+  wmove(output_win, ypos + NUM_STRINGS, 0);
+  wclrtoeol(output_win);
+  mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
+ }
 
 void 
 renderTab()
@@ -76,7 +75,7 @@ renderTab()
   {
     for (int j = 0; j < cols; j++)
     {
-      mvprintw(i, j, "-");
+      mvwprintw(output_win, i, j, "-");
     }
   }
   numTabs++;
@@ -90,8 +89,8 @@ moveYPos(int y)
   {
     if (curTab > 1 && xpos >= 6)
     {
-      move(ypos + NUM_STRINGS, 0);
-      clrtoeol();
+      wmove(output_win, ypos + NUM_STRINGS, 0);
+      wclrtoeol(output_win);
       ypos -= COM_GAP + NUM_STRINGS;
       curTab--;
       showPos();
@@ -99,19 +98,20 @@ moveYPos(int y)
   }
   else if (y == 1)
   {
-    move(ypos + NUM_STRINGS, 0);
-    clrtoeol();
+    wmove(output_win, ypos + NUM_STRINGS, 0);
+    wclrtoeol(output_win);
     ypos += COM_GAP + NUM_STRINGS;
     curTab++;
     showPos();
   }
+  wrefresh(output_win);
 }
 
 void 
 moveXPos(int x)
 {
-  move(ypos + NUM_STRINGS, 0);
-  clrtoeol();
+  wmove(output_win, ypos + NUM_STRINGS, 0);
+  wclrtoeol(output_win);
   if (xpos + x > 4 || (xpos + x > 0 && curTab > 1))
   {
     xpos += x;
@@ -128,7 +128,7 @@ moveXPos(int x)
         moveYPos(1);
       }
     }
-    showPos();
+    showPos(output_win);
   }
   else if (curTab > 1)
   {
@@ -136,6 +136,7 @@ moveXPos(int x)
     moveYPos(-1);
     showPos();
   }
+  wrefresh(output_win);
 }
 
 void 
@@ -152,16 +153,15 @@ setTuning(char tuning[][LEN_ARGS])
   }
   if (tuningIndex == -1)
   {
-    mvprintw(LINES - 2, 0, "No tuning found: %s", tuning[1]);
-    refresh();
+    mvwprintw(output_win, LINES - 2, 0, "No tuning found: %s", tuning[1]);
     return;
   }
   for (int i = 0; i < NUM_STRINGS; i++)
   {
-    mvprintw(COM_GAP + i, 2, " ");
-    mvprintw(COM_GAP + i, 1, "%s", tuningStrings[tuningIndex][i]);
+    mvwprintw(output_win, COM_GAP + i, 2, " ");
+    mvwprintw(output_win, COM_GAP + i, 1, "%s", tuningStrings[tuningIndex][i]);
   }
-  refresh();
+ 
 }
 
 void 
@@ -176,7 +176,7 @@ addNote(char notes[][LEN_ARGS])
     }
     else
     {
-      mvprintw(selectedString + ypos, xpos, "%s", notes[i]);
+      mvwprintw(output_win, selectedString + ypos, xpos, "%s", notes[i]);
       moveXPos(strlen(notes[i]) + 1);
     }
   }
@@ -204,11 +204,11 @@ addTimeSignature(char *timeSig)
       if (timeSig[i] == '/')
       {
         line++;
-        mvprintw(line, column, "/");
+        mvwprintw(output_win, line, column, "/");
         line++;
         i++;
       }
-      mvprintw(line, column, "%c", timeSig[i]);
+      mvwprintw(output_win, line, column, "%c", timeSig[i]);
     }
     moveXPos(3);
   }
@@ -227,7 +227,7 @@ addChord(char chords[][LEN_ARGS])
     {
       for (int j = 0; j < NUM_STRINGS; j++)
       {
-        mvprintw(j + ypos, xpos, "%c", chords[i][j]);
+        mvwprintw(output_win, j + ypos, xpos, "%c", chords[i][j]);
       }
       moveXPos(2);
     }
@@ -236,18 +236,25 @@ addChord(char chords[][LEN_ARGS])
 void 
 handleInput(WINDOW *input_win)
 {
-  char input[NUM_ARGS * LEN_ARGS];
+  char input[(NUM_ARGS*LEN_ARGS*2)-1];
   int input_len = 0;
+  int arg_len = 0;
   mvwprintw(input_win, 0, 0, "input command: ");
   wrefresh(input_win);
   while (1)
   {
+
     int ch = wgetch(input_win);
+    if( ch == ' ')
+    {
+      arg_len = 0;
+    }
     if (ch == '\n')
     {
       wmove(input_win, 0, 14);
       wclrtoeol(input_win);
       wrefresh(input_win);
+      arg_len=0;
       break;
     }
     else if (ch == KEY_BACKSPACE)
@@ -258,6 +265,7 @@ handleInput(WINDOW *input_win)
         wmove(input_win, 0, 14 + input_len - 1);
         wrefresh(input_win);
         input[--input_len] = '\0';
+        arg_len--;
       }
     }
     else if (ch == KEY_RIGHT)
@@ -284,20 +292,24 @@ handleInput(WINDOW *input_win)
       moveXPos(-1);
       for (int j = 0; j < NUM_STRINGS; j++)
       {
-        mvprintw(j + ypos, xpos, "-");
+        mvwprintw(output_win, j + ypos, xpos, "-");
       }
     }
-    else if (input_len < sizeof(input) - 1)
+    else if (input_len < sizeof(input) - 1 && arg_len<LEN_ARGS)
     {
+
       curs_set(1);
       input[input_len++] = ch;
       input[input_len] = '\0';
 
       mvwaddch(input_win, 0, 14 + input_len - 1, ch);
       wrefresh(input_win);
-      move(LINES - 2, 0);
-      clrtoeol();
+      wmove(output_win, LINES - 2, 0);
+      wclrtoeol(output_win);
+      arg_len++;
     }
+
+ 
   }
   if (strlen(input) > 1)
   {
@@ -343,7 +355,7 @@ handleInput(WINDOW *input_win)
       moveXPos(2);
     }
   }
-  refresh();
+  wrefresh(output_win);
 }
 
 int 
@@ -355,20 +367,24 @@ main()
   scrollok(stdscr, TRUE);
   curs_set(0);
   WINDOW *input_win = newwin(1, COLS, LINES - 1, 0);
+  output_win = newwin(LINES-2,COLS, 0, 0);
+
   scrollok(input_win, FALSE);
+  scrollok(output_win, TRUE);
+
   keypad(input_win, TRUE);
   getmaxyx(stdscr, rows, cols);
   for (int i = ypos; i < COM_GAP + NUM_STRINGS; i++)
   {
-    mvprintw(i, 1, "%s %s", tuningStrings[0][i - ypos], "|");
-    mvprintw(i, 0, " ");
+    mvwprintw(output_win, i, 1, "%s %s", tuningStrings[0][i - ypos], "|");
+    mvwprintw(output_win, i, 0, " ");
     for (int j = 4; j < cols; j++)
     {
-      mvprintw(i, j, "-");
+      mvwprintw(output_win, i, j, "-");
     }
   }
-  showPos();
-  refresh();
+  showPos(output_win);
+  wrefresh(output_win);
   while (1)
   {
     handleInput(input_win);
