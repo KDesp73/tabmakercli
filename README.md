@@ -13,13 +13,13 @@ Manual:
   - To add time signatures type in s followed by the time signature. There's a char array with allowed time signatures
     Example: s 4/4 (adds 4/4 time signature)
   - To Make a divider just type in |
+  - Export using x followed by filename
   - You can move the indicator left or right and up or down using arrow keys or touchpad.
   - You can delete something by moving the indicator to the position and pressing the delete button.
     
 To-Do:
  *  Add support for more strings
  *  Add Tempo, comments, Parts
- *  Export as txt
  *  Delete Tabs
  *  Copy/Paste whole Tabs
  *  Responsive to resizing
