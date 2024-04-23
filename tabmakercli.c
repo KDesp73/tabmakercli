@@ -23,6 +23,8 @@
 #include <string.h>
 #include <ctype.h>
 
+
+
 #define NUM_TUNINGS 8   /* Number of tunings, change as you add more. */
 #define NUM_TIMESIG 25  /* Number of time signatures, change as you add more. */
 #define NUM_STRINGS 6   /* Number of strings, don't change as not supported yet. */
@@ -233,6 +235,34 @@ addChord(char chords[][LEN_ARGS])
     }
   }
 }
+
+void 
+saveOutput(const char *filename)
+{
+  FILE *file = fopen(filename, "w");
+  if (file == NULL)
+  {
+    perror("Error opening file");
+    return;
+  }
+  for(int y=0; y<rows;y++)
+  {
+    for(int x=0;x<cols;x++)
+    {
+      int item = mvwinch(output_win, y,x);
+      if(item == ERR)
+      {
+        fputc(' ', file);
+      }
+      else 
+      {
+        fputc(item & A_CHARTEXT, file);
+      }
+    }
+    fputc('\n', file);
+  }
+  fclose(file);
+}
 void 
 handleInput(WINDOW *input_win)
 {
@@ -243,7 +273,6 @@ handleInput(WINDOW *input_win)
   wrefresh(input_win);
   while (1)
   {
-
     int ch = wgetch(input_win);
     if( ch == ' ')
     {
@@ -353,6 +382,10 @@ handleInput(WINDOW *input_win)
         mvprintw(j + ypos, xpos, "|");
       }
       moveXPos(2);
+    }
+    else if (strcmp(input, "x") == 0)
+    {
+      saveOutput(output[1]);
     }
   }
   wrefresh(output_win);
