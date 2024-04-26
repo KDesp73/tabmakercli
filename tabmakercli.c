@@ -8,16 +8,6 @@
 
 /* Simple program to write tabs */
 
-/*
- * To-Do:
- *  Add support for more strings
- *  Add Tempo, comments, Parts
- *  Export as txt
- *  Delete Tabs
- *  Copy/Paste whole Tabs
- *  Responsive to resizing
- *  Scrolling
- */
 
 #include <ncurses.h>
 #include <string.h>
@@ -29,7 +19,7 @@
 #define NUM_TIMESIG 25  /* Number of time signatures, change as you add more. */
 #define NUM_STRINGS 6   /* Number of strings, don't change as not supported yet. */
 #define NUM_ARGS    10  /* Number of arguments in one input. */
-#define LEN_ARGS    10  /* Length of each argument. */
+#define LEN_ARGS    20  /* Length of each argument. */
 #define COM_GAP     3   /* Gap left for comments, tempo etc. */
 
 int xpos       = 7;        /* initial X position */
@@ -38,6 +28,8 @@ int curTab     = 1;        /* initial current tab */
 int numTabs    = 1;        /* initial number of tabs */
 int rows, cols;            /* initialisation of terminal rows and columns */
 WINDOW *output_win;
+
+/*char filePath[100] = "/home/kliogka/"; remove comments here and in saveOutput*/
 
 char *tuningNames[NUM_TUNINGS] =
     {"E", "D#", "D", "C#", "C", "B", "A#", "A"};
@@ -237,31 +229,34 @@ addChord(char chords[][LEN_ARGS])
 }
 
 void 
-saveOutput(const char *filename)
+saveOutput(char *filename)
 {
-  mvwprintw(output_win, ypos + NUM_STRINGS, xpos, " ");
+   mvwprintw(output_win, ypos + NUM_STRINGS, xpos, " "); 
+  //strcat(filePath, filename);
+  //strcpy(filename, filePath);
+
   FILE *file = fopen(filename, "w");
-  if (file == NULL)
-  {
-    perror("Error opening file");
-    return;
-  }
-  for(int y=0; y<rows;y++)
-  {
-    for(int x=0;x<cols;x++)
-    {
-      int item = mvwinch(output_win, y,x);
-      if(item == ERR)
+      if (file == NULL)
       {
-        fputc(' ', file);
+          perror("Error opening file");
+          return;
       }
-      else 
+      for(int y = 0; y < rows; y++)
       {
-        fputc(item & A_CHARTEXT, file);
+          for(int x = 0; x < cols; x++)
+          {
+              int item = mvwinch(output_win, y, x);
+              if(item == ERR)
+              {
+                  fputc(' ', file);
+              }
+              else 
+              {
+                  fputc(item & A_CHARTEXT, file);
+              }
+          }
+          fputc('\n', file);
       }
-    }
-    fputc('\n', file);
-  }
   fclose(file);
   mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
 }
@@ -379,10 +374,10 @@ handleInput(WINDOW *input_win)
     }
     else if (strcmp(input, "x") == 0)
     {
+       
       saveOutput(output[1]);
     }
   }else {
-    
     if (strcmp(input, "|") == 0)
     {
       for (int j = 0; j < NUM_STRINGS; j++)
