@@ -239,6 +239,7 @@ addChord(char chords[][LEN_ARGS])
 void 
 saveOutput(const char *filename)
 {
+  mvwprintw(output_win, ypos + NUM_STRINGS, xpos, " ");
   FILE *file = fopen(filename, "w");
   if (file == NULL)
   {
@@ -262,6 +263,7 @@ saveOutput(const char *filename)
     fputc('\n', file);
   }
   fclose(file);
+  mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
 }
 void 
 handleInput(WINDOW *input_win)
@@ -375,17 +377,20 @@ handleInput(WINDOW *input_win)
     {
       addChord(output);
     }
-    else if (strcmp(input, "|") == 0)
-    {
-      for (int j = 0; j < NUM_STRINGS; j++)
-      {
-        mvprintw(j + ypos, xpos, "|");
-      }
-      moveXPos(2);
-    }
     else if (strcmp(input, "x") == 0)
     {
       saveOutput(output[1]);
+    }
+  }else {
+    
+    if (strcmp(input, "|") == 0)
+    {
+      for (int j = 0; j < NUM_STRINGS; j++)
+      {
+        mvwprintw(output_win, j + ypos, xpos, "|");
+      }
+    
+      moveXPos(2);
     }
   }
   wrefresh(output_win);
