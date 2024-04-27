@@ -60,6 +60,7 @@ showPos()
   wmove(output_win, ypos + NUM_STRINGS, 0);
   wclrtoeol(output_win);
   mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
+  wrefresh(output_win);
  }
 
 void 
@@ -106,12 +107,12 @@ moveXPos(int x)
 {
   wmove(output_win, ypos + NUM_STRINGS, 0);
   wclrtoeol(output_win);
-  if (xpos + x > 4 || (xpos + x > 0 && curTab > 1))
+  if (xpos + x >= 0)
   {
     xpos += x;
     if (xpos >= cols)
     {
-      xpos = 2;
+      xpos = 0;
       if (numTabs == curTab)
       {
         moveYPos(1);
@@ -130,8 +131,7 @@ moveXPos(int x)
     moveYPos(-1);
     showPos();
   }
-  wrefresh(output_win);
-}
+ }
 
 void 
 setTuning(char tuning[][LEN_ARGS])
@@ -152,6 +152,7 @@ setTuning(char tuning[][LEN_ARGS])
   }
   for (int i = 0; i < NUM_STRINGS; i++)
   {
+    mvwprintw(output_win, COM_GAP + i, 0, " ");
     mvwprintw(output_win, COM_GAP + i, 2, " ");
     mvwprintw(output_win, COM_GAP + i, 1, "%s", tuningStrings[tuningIndex][i]);
   }
@@ -170,8 +171,16 @@ addNote(char notes[][LEN_ARGS])
     }
     else
     {
-      mvwprintw(output_win, selectedString + ypos, xpos, "%s", notes[i]);
-      moveXPos(strlen(notes[i]) + 1);
+      for(int j=0; j<LEN_ARGS; j++)
+      {
+        if(notes[i][j]=='\0')
+        {
+                break;
+        }
+         mvwprintw(output_win, selectedString + ypos, xpos, "%c", notes[i][j]);
+         moveXPos(1);
+      }
+      moveXPos(1);
     }
   }
 }
