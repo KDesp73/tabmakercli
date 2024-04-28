@@ -18,6 +18,7 @@
 #define NUM_TUNINGS 8   /* Number of tunings, change as you add more. */
 #define NUM_TIMESIG 25  /* Number of time signatures, change as you add more. */
 #define NUM_STRINGS 6   /* Number of strings, don't change as not supported yet. */
+#define NUM_CHORDS 9
 #define NUM_ARGS    10  /* Number of arguments in one input. */
 #define LEN_ARGS    20  /* Length of each argument. */
 #define COM_GAP     3   /* Gap left for comments, tempo etc. */
@@ -43,6 +44,12 @@ char *tuningStrings[NUM_TUNINGS][NUM_STRINGS] = {
     {"A#", "F", "D", "A", "E", "A#"},    
     {"A", "E", "C#", "G#", "D#", "A"}     
 };
+
+char *chordNames[NUM_CHORDS] =
+  {"A", "Am", "C", "D", "Dm", "E", "Em", "F", "G" };
+
+char *chords[NUM_CHORDS] =
+  {"02220x", "012200", "01023x", "2320xx", "1320xx", "001220", "000220", "112311",   "330023" };
 
 char *timeSignatures[NUM_TIMESIG] =
     {
@@ -188,34 +195,30 @@ addNote(char notes[][LEN_ARGS])
 void 
 addTimeSignature(char *timeSig)
 {
-  bool flag = false;
-
+  
   for (int i = 0; i < NUM_TIMESIG; i++)
   {
     if (strcmp(timeSig, timeSignatures[i]) == 0)
     {
-      flag = true;
-      break;
+     int line = ypos + 2;
+        int column = xpos;
+        for (int j = 0; j < strlen(timeSignatures[i]); j++)
+        {
+          if (timeSignatures[i][j] == '/')
+          {
+            line++;
+            mvwprintw(output_win, line, column, "/");
+            line++;
+            j++;
+          }
+          mvwprintw(output_win, line, column, "%c", timeSignatures[i][j]);
+        }
+        moveXPos(2);
+        break;
+
     }
   }
-  if (flag)
-  {
-    int line = ypos + 2;
-    int column = xpos;
-    for (int i = 0; i < strlen(timeSig); i++)
-    {
-      if (timeSig[i] == '/')
-      {
-        line++;
-        mvwprintw(output_win, line, column, "/");
-        line++;
-        i++;
-      }
-      mvwprintw(output_win, line, column, "%c", timeSig[i]);
-    }
-    moveXPos(3);
-  }
-}
+ }
 
 void 
 addChord(char chords[][LEN_ARGS])
@@ -228,6 +231,7 @@ addChord(char chords[][LEN_ARGS])
     }
     else
     {
+      
       for (int j = 0; j < NUM_STRINGS; j++)
       {
         mvwprintw(output_win, j + ypos, xpos, "%c", chords[i][j]);
