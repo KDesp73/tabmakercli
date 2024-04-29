@@ -309,7 +309,11 @@ handleInput(WINDOW *input_win)
     }
     else if (ch == KEY_RIGHT)
     {
-      moveXPos(1);
+      if(xpos<cols-1 || numTabs!=curTab)
+      {
+        moveXPos(1);
+
+      }
     }
     else if (ch == KEY_LEFT)
     {
