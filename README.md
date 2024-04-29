@@ -4,16 +4,16 @@ Use .c file to add more time signatures, tunings and change settings
 
 Manual:
 
-  - To add a note, select string number and type in the notes you want. You can actually add whatever character you want, was going to use a char array for allowed characters but decided not to.
+  - [1-6] [characters] Adding notes on single string
     Example: 1 2h3 3p2 1 1 5 7 9 12 (adds all these characters on string 1)
-  - To add chord just type in c followed by the chord of your choice. You can add multiple chords in one line.
+  - c [characters] Adding chords
     Example: c 01220x 133211 (Adds Am and F chord)
-  - To change tuning type in t followed by the tuning name (found in .c file)
+  - t [tuning name] Changing tuning
     Example: t d# (change tuning to D# standard)
-  - To add time signatures type in s followed by the time signature. There's a char array with allowed time signatures
+  - s [time signature]
     Example: s 4/4 (adds 4/4 time signature)
-  - To Make a divider just type in |
-  - Export using x followed by filename
+  - | Bar line
+  - x [filepath] Save file, edit .c file to add custom path
   - You can move the indicator left or right and up or down using arrow keys or touchpad.
   - You can delete something by moving the indicator to the position and pressing the delete button.
     
