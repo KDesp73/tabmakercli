@@ -138,6 +138,7 @@ moveXPos(int x)
     moveYPos(-1);
     showPos();
   }
+  
  }
 
 void 
@@ -312,7 +313,6 @@ handleInput(WINDOW *input_win)
       if(xpos<cols-1 || numTabs!=curTab)
       {
         moveXPos(1);
-
       }
     }
     else if (ch == KEY_LEFT)
@@ -333,7 +333,7 @@ handleInput(WINDOW *input_win)
     else if (ch == KEY_DC)
     {
       moveXPos(-1);
-      for (int j = 0; j < NUM_STRINGS; j++)
+      for (int j = 0; j < NUM_STRINGS+1; j++)
       {
         mvwprintw(output_win, j + ypos, xpos, "-");
       }
