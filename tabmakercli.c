@@ -57,7 +57,7 @@ char *timeSignatures[NUM_TIMESIG] =
         "12/8", "5/4", "7/8", "3/8", "2/2",
         "5/8", "7/4", "3/2", "4/2", "2/8",
         "6/4", "9/4", "12/16", "7/16", "11/8",
-        "5/16", "13/8", "10/8", "15/8", "16/8"
+        "5/16", "13/8", "10/8", "15/8", "16/8",
     };
 
 void 
@@ -142,6 +142,37 @@ moveXPos(int x)
  }
 
 void 
+addTimeSignature(char *timeSig)
+{
+  
+  for (int i = 0; i < NUM_TIMESIG; i++)
+  {
+    if (strcmp(timeSig, timeSignatures[i]) == 0)
+    {
+        int line = ypos + 2;
+        int column = xpos;
+        for (int j = 0; j < strlen(timeSignatures[i]); j++)
+        {
+          if (timeSignatures[i][j] == '/')
+          {
+            column=xpos;
+            line++;
+            mvwprintw(output_win, line, column, "/");
+            line++;
+            
+          }
+          else
+          {
+            mvwprintw(output_win, line, column, "%c", timeSignatures[i][j]);
+            column++;
+          }
+         }
+        moveXPos(3);
+        break;
+    }
+  }
+ }
+void 
 setTuning(char tuning[][LEN_ARGS])
 {
   int tuningIndex = -1;
@@ -193,53 +224,24 @@ addNote(char notes[][LEN_ARGS])
   }
 }
 
-void 
-addTimeSignature(char *timeSig)
-{
-  
-  for (int i = 0; i < NUM_TIMESIG; i++)
-  {
-    if (strcmp(timeSig, timeSignatures[i]) == 0)
-    {
-     int line = ypos + 2;
-        int column = xpos;
-        for (int j = 0; j < strlen(timeSignatures[i]); j++)
-        {
-          if (timeSignatures[i][j] == '/')
-          {
-            line++;
-            mvwprintw(output_win, line, column, "/");
-            line++;
-            j++;
-          }
-          mvwprintw(output_win, line, column, "%c", timeSignatures[i][j]);
-        }
-        moveXPos(2);
-        break;
-
-    }
-  }
- }
 
 void 
 addChord(char chords[][LEN_ARGS])
 {
+  int line=0;
   for (int i = 1; i < NUM_ARGS; i++)
   {
     if (strcmp(chords[i], "") == 0)
     {
       break;
     }
-    else
+    else if(line<=NUM_STRINGS-1)
     {
-      
-      for (int j = 0; j < NUM_STRINGS; j++)
-      {
-        mvwprintw(output_win, j + ypos, xpos, "%c", chords[i][j]);
-      }
-      moveXPos(2);
+        mvwprintw(output_win, ypos+line, xpos, "%s", chords[i]);
+        line++;
     }
   }
+  moveXPos(2);
 }
 
 void 
@@ -377,13 +379,16 @@ handleInput(WINDOW *input_win)
     {
       setTuning(output);
     }
-    else if (isdigit(output[0][0]) && output[0][0] - '0' <= NUM_STRINGS && output[0][1] == '\0')
+    else if (isdigit(output[0][0]) && 
+             output[0][0] - '0' <= NUM_STRINGS &&
+             output[0][0] - '0' > 0 &&
+             output[0][1] == '\0')
     {
       addNote(output);
     }
     else if (strcmp(output[0], "s") == 0)
     {
-      addTimeSignature(output[1]);
+         addTimeSignature(output[1]); 
     }
     else if (strcmp(output[0], "c") == 0)
     {
