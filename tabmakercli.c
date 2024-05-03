@@ -30,7 +30,7 @@ int numTabs    = 1;        /* initial number of tabs */
 int rows, cols;            /* initialisation of terminal rows and columns */
 WINDOW *output_win;
 
-/*char filePath[100] = "/home/kliogka/"; remove comments here and in saveOutput*/
+/*char filePath[100] = "/home/$USER/"; Add custom path, remove comments here and in saveOutput*/
 
 char *tuningNames[NUM_TUNINGS] =
     {"E", "D#", "D", "C#", "C", "B", "A#", "A"};
@@ -226,22 +226,56 @@ addNote(char notes[][LEN_ARGS])
 
 
 void 
-addChord(char chords[][LEN_ARGS])
+addChord(char chord[][LEN_ARGS])
 {
-  int line=0;
-  for (int i = 1; i < NUM_ARGS; i++)
+  int line;
+  for(int i=1; i<NUM_ARGS;i++)
   {
-    if (strcmp(chords[i], "") == 0)
+    line=0;
+    if (strcmp(chord[i], "") == 0)
     {
       break;
     }
-    else if(line<=NUM_STRINGS-1)
+    for(int j=0;j<NUM_CHORDS;j++)
     {
-        mvwprintw(output_win, ypos+line, xpos, "%s", chords[i]);
-        line++;
+      if (strcasecmp(chord[i], chordNames[j]) == 0 && line<=NUM_STRINGS-1)
+      {
+        for(int k=0;k<strlen(chords[j]);k++)
+        {
+             mvwprintw(output_win, ypos+line, xpos, "%c", chords[j][k]);
+             line++;
+        }  
+        moveXPos(2);
+        break; 
+      }  
+    }
+    if(line==0)
+    {
+      for(int j=0; j<NUM_ARGS; j++)
+      {
+        if(line<=NUM_STRINGS-1)
+        {
+            if(chord[i][j]=='^' && chord[i][j+1]!='\0' )
+            {
+               mvwprintw(output_win, ypos+line, xpos, "%c", chord[i][j+1]);
+                
+               if(chord[i][j+2]!='\0')
+               {
+                  mvwprintw(output_win, ypos+line, xpos+1, "%c", chord[i][j+2]);
+                  j++;
+               }
+               j++;
+            }
+            else
+            {
+            mvwprintw(output_win, ypos+line, xpos, "%c", chord[i][j]);
+            }
+            line++;
+        }
+      }
+      moveXPos(2); 
     }
   }
-  moveXPos(2);
 }
 
 void 
