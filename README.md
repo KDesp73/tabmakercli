@@ -36,13 +36,4 @@ Manual:
   - Press delete key to delete   
 
 
-To-Do:
- *  Add support for more strings
- *  Add space for comments
- *  Delete Tabs
- *  Copy/Paste
- *  Responsive to resizing
- *  Scrolling
- *  Add multiples of the same note/chord using * characters
- *  Import
 
