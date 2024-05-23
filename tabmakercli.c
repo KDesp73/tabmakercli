@@ -12,6 +12,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 
 
@@ -226,57 +227,61 @@ addNote(char notes[][LEN_ARGS])
 
 
 void 
-addChord(char chord[][LEN_ARGS])
+addChord(char chord[][LEN_ARGS], int numTimes)
 {
   int line;
-  for(int i=1; i<NUM_ARGS;i++)
+  for(int multiples=1; multiples<=numTimes; multiples++)
   {
-    line=0;
-    if (strcmp(chord[i], "") == 0)
+   for(int i=1; i<NUM_ARGS;i++)
     {
-      break;
-    }
-    for(int j=0;j<NUM_CHORDS;j++)
-    {
-      if (strcasecmp(chord[i], chordNames[j]) == 0 && line<=NUM_STRINGS-1)
+      line=0;
+      if (strcmp(chord[i], "") == 0)
       {
-        for(int k=0;k<strlen(chords[j]);k++)
-        {
-             mvwprintw(output_win, ypos+line, xpos, "%c", chords[j][k]);
-             line++;
-        }  
-        moveXPos(2);
-        break; 
-      }  
-    }
-    if(line==0)
-    {
-      for(int j=0; j<NUM_ARGS; j++)
-      {
-        if(line<=NUM_STRINGS-1)
-        {
-            if(chord[i][j]=='^' && chord[i][j+1]!='\0' )
-            {
-               mvwprintw(output_win, ypos+line, xpos, "%c", chord[i][j+1]);
-                
-               if(chord[i][j+2]!='\0')
-               {
-                  mvwprintw(output_win, ypos+line, xpos+1, "%c", chord[i][j+2]);
-                  j++;
-               }
-               j++;
-            }
-            else
-            {
-            mvwprintw(output_win, ypos+line, xpos, "%c", chord[i][j]);
-            }
-            line++;
-        }
+        break;
       }
-      moveXPos(2); 
+      for(int j=0;j<NUM_CHORDS;j++)
+      {
+        if (strcasecmp(chord[i], chordNames[j]) == 0 && line<=NUM_STRINGS-1)
+        {
+          for(int k=0;k<strlen(chords[j]);k++)
+          {
+               mvwprintw(output_win, ypos+line, xpos, "%c", chords[j][k]);
+               line++;
+          }  
+          moveXPos(2);
+          break; 
+        }  
+      }
+      if(line==0)
+      {
+        for(int j=0; j<NUM_ARGS; j++)
+        {
+          if(line<=NUM_STRINGS-1)
+          {
+              if(chord[i][j]=='^' && chord[i][j+1]!='\0' )
+              {
+                 mvwprintw(output_win, ypos+line, xpos, "%c", chord[i][j+1]);
+                  
+                 if(chord[i][j+2]!='\0')
+                 {
+                    mvwprintw(output_win, ypos+line, xpos+1, "%c", chord[i][j+2]);
+                    j++;
+                 }
+                 j++;
+              }
+              else
+              {
+              mvwprintw(output_win, ypos+line, xpos, "%c", chord[i][j]);
+              }
+              line++;
+          }
+        }
+        moveXPos(2); 
+      }
     }
+
   }
-}
+ }
 
 void 
 saveOutput(char *filename)
@@ -310,6 +315,26 @@ saveOutput(char *filename)
   fclose(file);
   mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
 }
+
+
+
+int
+ismultiple(const char *output)
+{
+  for(int i=1; output[i]!='\0';i++)
+  {
+    if(output[i]=='\0')
+    {
+      return 0;
+    }
+    if(!isdigit(output[i]))
+    { 
+      return 0;
+    }
+  }
+  return 1;
+}
+
 void 
 handleInput(WINDOW *input_win)
 {
@@ -343,6 +368,10 @@ handleInput(WINDOW *input_win)
         input[--input_len] = '\0';
         arg_len--;
       }
+    }
+    else if (ch == KEY_RESIZE)
+    {
+      getmaxyx(stdscr, rows, cols);
     }
     else if (ch == KEY_RIGHT)
     {
@@ -424,9 +453,22 @@ handleInput(WINDOW *input_win)
     {
          addTimeSignature(output[1]); 
     }
-    else if (strcmp(output[0], "c") == 0)
+    else if (output[0][0] == 'c')
     {
-      addChord(output);
+      if(strlen(output[0])==1)
+      {
+         addChord(output,1);
+
+      }
+      else 
+      {
+        if(ismultiple(output[0]))
+        {
+          addChord(output,atoi(output[0]+1));
+        }
+
+      }
+         
     }
     else if (strcmp(input, "x") == 0)
     {
