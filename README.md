@@ -13,9 +13,13 @@ Manual:
 
     To add double digit frets, use ^
 
-    Example: c 12^10^10 
+    Example: c ^12^10^10 
 
-    - t [tuning name] Changing tuning 
+    To repeat multiple times just type in the number of times in front of c.
+
+    Example: c2 Am F (Result: Am F Am F)
+
+  - t [tuning name] Changing tuning 
 
     Example: t d# 
 
