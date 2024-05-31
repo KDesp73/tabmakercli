@@ -87,7 +87,6 @@ renderTab()
 void 
 moveYPos(int y)
 {
-
   if (y == -1)
   {
     if (curTab > 1 && xpos >= 6)
@@ -139,13 +138,11 @@ moveXPos(int x)
     moveYPos(-1);
     showPos();
   }
-  
  }
 
 void 
 addTimeSignature(char *timeSig)
 {
-  
   for (int i = 0; i < NUM_TIMESIG; i++)
   {
     if (strcmp(timeSig, timeSignatures[i]) == 0)
@@ -160,7 +157,6 @@ addTimeSignature(char *timeSig)
             line++;
             mvwprintw(output_win, line, column, "/");
             line++;
-            
           }
           else
           {
@@ -196,34 +192,37 @@ setTuning(char tuning[][LEN_ARGS])
     mvwprintw(output_win, COM_GAP + i, 2, " ");
     mvwprintw(output_win, COM_GAP + i, 1, "%s", tuningStrings[tuningIndex][i]);
   }
- 
 }
 
 void 
-addNote(char notes[][LEN_ARGS])
+addNote(char notes[][LEN_ARGS], int numTimes)
 {
   int selectedString = notes[0][0] - '0' - 1;
-  for (int i = 1; i < NUM_ARGS; i++)
+    for(int multiples=1; multiples<=numTimes; multiples++)
   {
-    if (strcmp(notes[i], "") == 0)
-    {
-      break;
-    }
-    else
-    {
-      for(int j=0; j<LEN_ARGS; j++)
+     for (int i = 1; i < NUM_ARGS; i++)
       {
-        if(notes[i][j]=='\0')
+        if (strcmp(notes[i], "") == 0)
         {
-                break;
+          break;
         }
-         mvwprintw(output_win, selectedString + ypos, xpos, "%c", notes[i][j]);
-         moveXPos(1);
+        else
+        {
+          for(int j=0; j<LEN_ARGS; j++)
+          {
+            if(notes[i][j]=='\0')
+            {
+                    break;
+            }
+             mvwprintw(output_win, selectedString + ypos, xpos, "%c", notes[i][j]);
+             moveXPos(1);
+          }
+          moveXPos(1);
+        }
       }
-      moveXPos(1);
-    }
+
   }
-}
+ }
 
 
 void 
@@ -279,7 +278,6 @@ addChord(char chord[][LEN_ARGS], int numTimes)
         moveXPos(2); 
       }
     }
-
   }
  }
 
@@ -289,7 +287,6 @@ saveOutput(char *filename)
    mvwprintw(output_win, ypos + NUM_STRINGS, xpos, " "); 
   //strcat(filePath, filename);
   //strcpy(filename, filePath);
-
   FILE *file = fopen(filename, "w");
       if (file == NULL)
       {
@@ -315,8 +312,6 @@ saveOutput(char *filename)
   fclose(file);
   mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
 }
-
-
 
 int
 ismultiple(const char *output)
@@ -405,7 +400,6 @@ handleInput(WINDOW *input_win)
     }
     else if (input_len < sizeof(input) - 1 && arg_len<LEN_ARGS)
     {
-
       curs_set(1);
       input[input_len++] = ch;
       input[input_len] = '\0';
@@ -416,8 +410,6 @@ handleInput(WINDOW *input_win)
       wclrtoeol(output_win);
       arg_len++;
     }
-
- 
   }
   if (strlen(input) > 1)
   {
@@ -444,10 +436,19 @@ handleInput(WINDOW *input_win)
     }
     else if (isdigit(output[0][0]) && 
              output[0][0] - '0' <= NUM_STRINGS &&
-             output[0][0] - '0' > 0 &&
-             output[0][1] == '\0')
+             output[0][0] - '0' > 0)
     {
-      addNote(output);
+      if(strlen(output[0])==1)
+      {
+         addNote(output,1);
+      }
+      else 
+      {
+        if(ismultiple(output[0]))
+        {
+          addNote(output,atoi(output[0]+1));
+        }
+      }
     }
     else if (strcmp(output[0], "s") == 0)
     {
@@ -458,7 +459,6 @@ handleInput(WINDOW *input_win)
       if(strlen(output[0])==1)
       {
          addChord(output,1);
-
       }
       else 
       {
@@ -466,13 +466,10 @@ handleInput(WINDOW *input_win)
         {
           addChord(output,atoi(output[0]+1));
         }
-
-      }
-         
+      }   
     }
     else if (strcmp(input, "x") == 0)
     {
-       
       saveOutput(output[1]);
     }
   }else {
@@ -482,7 +479,6 @@ handleInput(WINDOW *input_win)
       {
         mvwprintw(output_win, j + ypos, xpos, "|");
       }
-    
       moveXPos(2);
     }
   }
