@@ -7,6 +7,10 @@ Manual:
 
     Example: 1 2h3 3p2 1 1 5 7 9 12 (adds all these characters on string 1)
 
+    To repeat multiple times just type in the number of times in front of string number.
+
+    Example: 12 3 4 (Result: 3 4 3 4 on string 1)
+
   - c [chords] Adding multiple chords either custom or based on a name. 
 
     Example: c Am am E 0234xx 
