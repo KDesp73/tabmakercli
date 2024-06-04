@@ -340,7 +340,9 @@ handleInput(WINDOW *input_win)
   wrefresh(input_win);
   while (1)
   {
+
     int ch = wgetch(input_win);
+    
     if( ch == ' ')
     {
       arg_len = 0;
@@ -386,17 +388,23 @@ handleInput(WINDOW *input_win)
         moveYPos(1);
       }
     }
+    else if (ch == 9)
+    {
+       mvwprintw(output_win, ypos-1, xpos, " ");
+       moveXPos(-1);
+    }
     else if (ch == KEY_UP)
     {
       moveYPos(-1);
     }
     else if (ch == KEY_DC)
     {
-      moveXPos(-1);
       for (int j = 0; j < NUM_STRINGS+1; j++)
       {
         mvwprintw(output_win, j + ypos, xpos, "-");
       }
+      moveXPos(-1);
+
     }
     else if (input_len < sizeof(input) - 1 && arg_len<LEN_ARGS)
     {
@@ -436,7 +444,7 @@ handleInput(WINDOW *input_win)
     }
     else if (isdigit(output[0][0]) && 
              output[0][0] - '0' <= NUM_STRINGS &&
-             output[0][0] - '0' > 0)
+             output[0][0] - '0' >= 0)
     {
       if(strlen(output[0])==1)
       {
