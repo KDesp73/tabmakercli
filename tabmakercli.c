@@ -64,11 +64,22 @@ char *timeSignatures[NUM_TIMESIG] =
 void 
 showPos()
 {
+  
   curs_set(0);
   wmove(output_win, ypos + NUM_STRINGS, 0);
   wclrtoeol(output_win);
   mvwprintw(output_win, ypos + NUM_STRINGS, xpos, "^");
-  wrefresh(output_win);
+  for(int row=-1;row<6;row++)
+  {
+     mvwchgat(output_win,ypos+row,xpos,1,A_REVERSE,0,NULL);
+
+  }
+   wrefresh(output_win);
+   for(int row=-1;row<6;row++)
+  {
+     mvwchgat(output_win,ypos+row,xpos,1,A_NORMAL,0,NULL);
+
+  }
  }
 
 void 
@@ -89,7 +100,7 @@ moveYPos(int y)
 {
   if (y == -1)
   {
-    if (curTab > 1 && xpos >= 6)
+    if (curTab > 1)
     {
       wmove(output_win, ypos + NUM_STRINGS, 0);
       wclrtoeol(output_win);
@@ -106,14 +117,13 @@ moveYPos(int y)
     curTab++;
     showPos();
   }
-  wrefresh(output_win);
+ 
 }
 
 void 
 moveXPos(int x)
 {
-  wmove(output_win, ypos + NUM_STRINGS, 0);
-  wclrtoeol(output_win);
+ 
   if (xpos + x >= 0)
   {
     xpos += x;
@@ -190,6 +200,7 @@ setTuning(char tuning[][LEN_ARGS])
   {
     mvwprintw(output_win, COM_GAP + i, 0, " ");
     mvwprintw(output_win, COM_GAP + i, 2, " ");
+    mvwprintw(output_win, COM_GAP + i, 3, "|");
     mvwprintw(output_win, COM_GAP + i, 1, "%s", tuningStrings[tuningIndex][i]);
   }
 }
@@ -414,7 +425,7 @@ handleInput(WINDOW *input_win)
 
       mvwaddch(input_win, 0, 14 + input_len - 1, ch);
       wrefresh(input_win);
-      wmove(output_win, LINES - 2, 0);
+      wmove(output_win, LINES - 3, 0);
       wclrtoeol(output_win);
       arg_len++;
     }
