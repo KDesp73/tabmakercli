@@ -1,48 +1,37 @@
+
 Simple Guitar Tab Maker
 
-Use .c file to add more time signatures, tunings and change settings
+Usage:
+  [0-6] [characters]  Add notes on a single string
+                        Example: 1 2h3 3p2 1 1 5 7 9 12 (adds all these characters on string 1)
+                        To repeat multiple times, type the number of times in front of the string number.
+                        Example: 12 3 4 (Result: 3 4 3 4 on string 1)
 
-Manual:
-  - [0-6] [characters] Adding notes on single string
+  0 [text]            Add comments, bpm, notes, etc., on top of the tab
+                      Use the TAB key to delete them.
 
-    Example: 1 2h3 3p2 1 1 5 7 9 12 (adds all these characters on string 1)
+  c [chords]          Add multiple chords, either custom or based on a name.
+                        Example: c Am am E 0234xx
+                        To add double-digit frets, use ^
+                        Example: c ^12^10^10
+                        To repeat multiple times, type the number of times in front of c.
+                        Example: c2 Am F (Result: Am F Am F)
 
+  t [tuning name]     Change tuning
+                        Example: t d#
 
-    To repeat multiple times just type in the number of times in front of string number.
+  s [time signature]  Change time signature
+                        Example: s 4/4
 
-    Example: 12 3 4 (Result: 3 4 3 4 on string 1)
+  |                   Add a bar line
 
-    Use 0 to add comments, bpm, notes etc. on top of the tab. Use TAB key 
-    to delete them.
+  x [filepath]        Save file (edit .c file to add custom path)
 
+  Use the arrow keys or touchpad to navigate up, down, left, right.
+  Press the delete key to delete.
 
-  - c [chords] Adding multiple chords either custom or based on a name. 
+For more settings, use the .c file to add more time signatures, tunings, and change settings.
 
-    Example: c Am am E 0234xx 
-
-    To add double digit frets, use ^
-
-    Example: c ^12^10^10 
-
-    To repeat multiple times just type in the number of times in front of c.
-
-    Example: c2 Am F (Result: Am F Am F)
-
-  - t [tuning name] Changing tuning 
-
-    Example: t d# 
-
-  - s [time signature] 
-
-    Example: s 4/4 
-
-  - | Bar line
-
-  - x [filepath] Save file, edit .c file to add custom path
-
-  - Use arrow keys or touchpad to navigate up, down, left, right
-
-  - Press delete key to delete   
 
 
 

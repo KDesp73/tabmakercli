@@ -425,7 +425,7 @@ handleInput(WINDOW *input_win)
 
       mvwaddch(input_win, 0, 14 + input_len - 1, ch);
       wrefresh(input_win);
-      wmove(output_win, LINES - 3, 0);
+      wmove(output_win, LINES - COM_GAP - 1, 0);
       wclrtoeol(output_win);
       arg_len++;
     }
@@ -513,7 +513,7 @@ main()
   scrollok(stdscr, TRUE);
   curs_set(0);
   WINDOW *input_win = newwin(1, COLS, LINES - 1, 0);
-  output_win = newwin(LINES-2,COLS, 0, 0);
+  output_win = newwin(LINES-COM_GAP,COLS, 0, 0);
 
   scrollok(input_win, FALSE);
   scrollok(output_win, TRUE);
