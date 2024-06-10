@@ -1,5 +1,9 @@
 
 # Simple Guitar Tab Maker
+> [!IMPORTANT]
+>!!THIS IS A WIP PROJECT, SOME THINGS STILL DON'T WORK AS INTENDED!!
+> For example you cannot import nor you can resize the window or scroll.
+
 ![Screenshot_2024-06-10_17-50-07](https://github.com/konLiogka/tabmakercli/assets/78957746/3a1a6366-94b6-49db-82bb-4c099fde9d08)
 
 ## Usage:
