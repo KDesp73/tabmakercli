@@ -16,11 +16,10 @@
 #include <stdio.h>
 
 
-
 #define NUM_TUNINGS 11   /* Number of tunings, change as you add more. */
 #define NUM_TIMESIG 25  /* Number of time signatures, change as you add more. */
 #define NUM_STRINGS 6   /* Number of strings, don't change as not supported yet. */
-#define NUM_CHORDS 9
+#define NUM_CHORDS  9
 #define NUM_ARGS    10  /* Number of arguments in one input. */
 #define LEN_ARGS    20  /* Length of each argument. */
 #define COM_GAP     3   /* Gap left for comments, tempo etc. */
@@ -40,18 +39,18 @@ WINDOW *output_win;
 /*char filePath[100] = "/home/$USER/"; Add custom path, remove comments here and in saveOutput*/
 
 char *tuningNames[NUM_TUNINGS] = {
-    "E", 
-    "standard", 
-    "dropd",
-    "dadgad",
-    "D#", 
-    "D", 
-    "C#", 
-    "C", 
-    "B", 
-    "A#", 
-    "A"
-};
+        "E", 
+        "standard", 
+        "dropd",
+        "dadgad",
+        "D#", 
+        "D", 
+        "C#", 
+        "C", 
+        "B", 
+        "A#", 
+        "A"
+    };
 char *tuningStrings[NUM_TUNINGS][NUM_STRINGS] = {
         {"E",  "B",  "G",  "D",  "A",  "E" },
         {"E",  "B",  "G",  "D",  "A",  "E" },
@@ -106,8 +105,7 @@ renderTab()
 {
     for (int i = ypos; i < ypos + NUM_STRINGS; i++)
     {
-        mvwprintw(output_win, i, 0, " ");
-        mvwprintw(output_win, i, 1, "%s %s", tuningStrings[tuningIndex][i-ypos], "|");
+        mvwprintw(output_win, i, 0, " %-2s|", tuningStrings[tuningIndex][i-ypos]);
         for (int j = 4; j < cols; j++)
         {
             mvwprintw(output_win, i, j, "-");
@@ -201,15 +199,15 @@ addTimeSignature(char *timeSig)
     }
 }
 
-void 
-setTuning(char tuning[][LEN_ARGS], bool all)
+void
+setTuning(char tuning[][LEN_ARGS])
 {
     int index = -1;
     for (int i = 0; i < NUM_TUNINGS; ++i)
     {
         if (strcasecmp(tuning[1], tuningNames[i]) == 0)
         {
-            index  = i;
+            index = i;
             break;
         }
     }
@@ -217,20 +215,19 @@ setTuning(char tuning[][LEN_ARGS], bool all)
     {
         mvwprintw(output_win, LINES - 2, 0, "No tuning found: %s", tuning[1]);
         return;
-    } else tuningIndex = index;
+    }
+    
+    tuningIndex = index;
 
     for (size_t tab = 0; tab < numTabs; tab++)
     {
-        int yOffset = tab * (TAB_HEIGHT + COM_GAP);
-        if((!all && tab == ypos) || all) {
-            for (int i = 0; i < NUM_STRINGS; i++)
-            {
-                if(i == 0) yOffset += COM_GAP; // initial gap
-                mvwprintw(output_win, yOffset + i, 0, " ");
-                mvwprintw(output_win, yOffset + i, 2, " ");
-                mvwprintw(output_win, yOffset + i, 3, "|");
-                mvwprintw(output_win, yOffset + i, 1, "%s", tuningStrings[tuningIndex][i]);
-            }
+        int yOffset = tab * (TAB_HEIGHT + COM_GAP) + COM_GAP;
+
+        for (int i = 0; i < NUM_STRINGS; i++)
+        {
+            mvwprintw(output_win, 
+                    yOffset + i, 0, 
+                    " %-2s|", tuningStrings[tuningIndex][i]);
         }
     }
     
@@ -435,7 +432,7 @@ handleInput(WINDOW *input_win)
         // else if (ch == KEY_SDC) // Shift+Del
         else if (ch == KEY_TAB)
         {
-            if(xpos <= LOWER_BOUND) return;
+            if(xpos < LOWER_BOUND) return;
             mvwprintw(output_win, ypos-1, xpos, " ");
             moveXPos(-1);
         }
@@ -445,7 +442,7 @@ handleInput(WINDOW *input_win)
         }
         else if (ch == KEY_DC)
         {
-            if(xpos <= LOWER_BOUND) return;
+            if(xpos < LOWER_BOUND) return;
             for (int j = 0; j < NUM_STRINGS+1; j++)
             {
                 mvwprintw(output_win, j + ypos, xpos, "-");
@@ -487,7 +484,7 @@ handleInput(WINDOW *input_win)
         }
         if (strcmp(output[0], "t") == 0)
         {
-            setTuning(output, true);
+            setTuning(output);
         }
         else if (isdigit(output[0][0]) && 
                 output[0][0] - '0' <= NUM_STRINGS &&

@@ -1,4 +1,4 @@
 all: tabmakercli
 
 tabmakercli: tabmakercli.c
-	gcc -g -lncurses tabmakercli.c -o tabmakercli
+	gcc -ggdb -lncurses tabmakercli.c -o tabmakercli
