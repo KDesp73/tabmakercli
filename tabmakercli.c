@@ -17,7 +17,7 @@
 
 
 
-#define NUM_TUNINGS 8   /* Number of tunings, change as you add more. */
+#define NUM_TUNINGS 11   /* Number of tunings, change as you add more. */
 #define NUM_TIMESIG 25  /* Number of time signatures, change as you add more. */
 #define NUM_STRINGS 6   /* Number of strings, don't change as not supported yet. */
 #define NUM_CHORDS 9
@@ -39,10 +39,24 @@ WINDOW *output_win;
 
 /*char filePath[100] = "/home/$USER/"; Add custom path, remove comments here and in saveOutput*/
 
-char *tuningNames[NUM_TUNINGS] =
-    {"E", "D#", "D", "C#", "C", "B", "A#", "A"};
+char *tuningNames[NUM_TUNINGS] = {
+    "E", 
+    "standard", 
+    "dropd",
+    "dadgad",
+    "D#", 
+    "D", 
+    "C#", 
+    "C", 
+    "B", 
+    "A#", 
+    "A"
+};
 char *tuningStrings[NUM_TUNINGS][NUM_STRINGS] = {
         {"E",  "B",  "G",  "D",  "A",  "E" },
+        {"E",  "B",  "G",  "D",  "A",  "E" },
+        {"E",  "B",  "G",  "D",  "A",  "D" },        
+        {"D",  "A",  "G",  "D",  "A",  "D" },        
         {"D#", "A#", "F#", "C#", "G#", "D#"}, 
         {"D",  "A",  "F",  "C",  "G",  "D" },        
         {"C#", "G#", "F#", "C#", "G#", "C#"},  
